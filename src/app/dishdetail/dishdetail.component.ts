@@ -24,6 +24,8 @@ export class DishdetailComponent implements OnInit {
   //newcomment: Comment
   date:string;
   comment: Comment
+  dishcopy:Dish;
+
   @ViewChild('cform') CommentFormDirective;
  
 CommentForm: FormGroup;
@@ -90,7 +92,10 @@ CommentForm: FormGroup;
     this.comment = this.CommentForm.value;
     this.comment.date = new Date().toISOString();
     console.log(this.comment);
-    this.dish.comments.push(this.comment);
+    this.dishcopy.comments.push(this.comment);
+    this.dishService.putDish(this.dishcopy)
+    .subscribe(dish=>{this.dish=dish;this.dishcopy=dish;},
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; })
     this.CommentFormDirective.resetForm();
     this.CommentForm.reset({
       author: '',
@@ -106,7 +111,7 @@ CommentForm: FormGroup;
     .subscribe(dish=>this.dish=dish) */
     this.dishService.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
     this.route.params.pipe(switchMap((params: Params) => this.dishService.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); (errmess)=>this.errMess=<any>errmess });
+    .subscribe(dish => { this.dish = dish;this.dishcopy=dish; this.setPrevNext(dish.id); (errmess)=>this.errMess=<any>errmess });
   }
   setPrevNext(dishId: string) {
     const index = this.dishIds.indexOf(dishId);
